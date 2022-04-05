@@ -691,7 +691,7 @@ impl<'x> ExecutableReactions<'x> {
             let mut x = x.unwrap();
             let mut y = y.unwrap();
 
-            if x.max_level() > y.max_level() {
+            if x.max_level() < y.max_level() {
                 if let Cow::Owned(_) = y {
                     std::mem::swap(&mut x, &mut y);
                 }

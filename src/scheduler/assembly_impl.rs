@@ -545,3 +545,32 @@ macro_rules! unsafe_iter_bank {
         iter.map(move |(i, j)| unsafe { &mut (*__ptr.add(i)).$field_name[j] })
     }};
 }
+
+#[cfg(kani)]
+struct ExampleAdapter {
+    id: u32,
+    inpt: usize,
+}
+
+#[cfg(kani)]
+#[kani::proof]
+#[kani::unwind(9)]
+fn verify_unsafe_iter_bank() {
+    let len = kani::any();
+    kani::assume(len < 8);
+    let mut bank = Vec::with_capacity(len);
+
+    for i in 0..len {
+        bank.push(ExampleAdapter { id: 0, inpt: i });
+    }
+
+    let bank_iter = unsafe_iter_bank!(bank # inpt);
+
+    let mut iter_len = 0;
+    for (i, j) in bank_iter.enumerate() {
+        assert_eq!(i, *j);
+        iter_len = i + 1;
+    }
+
+    assert_eq!(len, iter_len);
+}

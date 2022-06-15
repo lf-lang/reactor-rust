@@ -554,10 +554,10 @@ struct ExampleAdapter {
 
 #[cfg(kani)]
 #[kani::proof]
-#[kani::unwind(9)]
+#[kani::unwind(6)]
 fn verify_unsafe_iter_bank() {
     let len = kani::any();
-    kani::assume(len < 8);
+    kani::assume(len < 5);
     let mut bank = Vec::with_capacity(len);
 
     for i in 0..len {

@@ -577,10 +577,10 @@ fn verify_unsafe_iter_bank() {
 
 #[cfg(kani)]
 #[kani::proof]
-#[kani::unwind(3)]
+#[kani::unwind(6)]
 fn verify_unsafe_iter_bank_single_index() {
     let len = kani::any();
-    kani::assume(len < 1);
+    kani::assume(len < 4);
     let mut bank = Vec::with_capacity(len);
 
     for i in 0..len {
@@ -596,4 +596,33 @@ fn verify_unsafe_iter_bank_single_index() {
     }
 
     assert_eq!(len, iter_len);
+}
+
+#[cfg(kani)]
+#[kani::proof]
+#[kani::unwind(4)]
+fn verify_unsafe_iter_bank_all_indices() {
+    let len = kani::any();
+    kani::assume(len < 2);
+    let mut bank = Vec::with_capacity(len);
+
+    for i in 0..len {
+        bank.push(ExampleAdapter { id: 0, inpt: [0, i] });
+    }
+
+    let bank_iter = unsafe_iter_bank!(bank # (inpt)+);
+
+    let mut iter_len = 0;
+    let mut i = 0;
+    for (c, j) in bank_iter.enumerate() {
+        if c % 2 == 0 {
+            assert_eq!(0, *j);
+        } else {
+            assert_eq!(i, *j);
+            i += 1;
+        }
+        iter_len += 1;
+    }
+
+    assert_eq!(len * 2, iter_len);
 }

@@ -547,9 +547,9 @@ macro_rules! unsafe_iter_bank {
 }
 
 #[cfg(kani)]
-struct ExampleAdapter {
+struct ExampleAdapter<T> {
     id: u32,
-    inpt: usize,
+    inpt: T,
 }
 
 #[cfg(kani)]
@@ -565,6 +565,29 @@ fn verify_unsafe_iter_bank() {
     }
 
     let bank_iter = unsafe_iter_bank!(bank # inpt);
+
+    let mut iter_len = 0;
+    for (i, j) in bank_iter.enumerate() {
+        assert_eq!(i, *j);
+        iter_len = i + 1;
+    }
+
+    assert_eq!(len, iter_len);
+}
+
+#[cfg(kani)]
+#[kani::proof]
+#[kani::unwind(3)]
+fn verify_unsafe_iter_bank_single_index() {
+    let len = kani::any();
+    kani::assume(len < 1);
+    let mut bank = Vec::with_capacity(len);
+
+    for i in 0..len {
+        bank.push(ExampleAdapter { id: 0, inpt: [0, i] });
+    }
+
+    let bank_iter = unsafe_iter_bank!(bank # inpt[1]);
 
     let mut iter_len = 0;
     for (i, j) in bank_iter.enumerate() {

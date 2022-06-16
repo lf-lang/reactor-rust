@@ -519,7 +519,7 @@ macro_rules! unsafe_iter_bank {
         let __bank_len = $bank.len();
         // Assume that the contained multiports of the bank
         // are all of the same length.
-        let __multiport_len = $bank[0].$field_name.len();
+        let __multiport_len = if __bank_len == 0 { 0 } else { $bank[0].$field_name.len() };
 
         // Build an iterator of tuples that get mapped to their
         // respective bank element and multiport.

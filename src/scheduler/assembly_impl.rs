@@ -647,7 +647,7 @@ fn verify_unsafe_iter_bank_interleaved() {
         bank.push(ExampleAdapter { id: 0, inpt: [0, i] });
     }
 
-    let mut bank_iter = unsafe_iter_bank!(bank # (inpt)+);
+    let mut bank_iter = unsafe_iter_bank!(bank # interleaved(inpt));
 
     for _ in 0..len {
         let bank_ele = bank_iter.next().unwrap();

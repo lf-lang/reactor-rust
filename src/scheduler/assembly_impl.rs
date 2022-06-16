@@ -547,9 +547,17 @@ macro_rules! unsafe_iter_bank {
 }
 
 #[cfg(kani)]
+#[derive(Copy, Clone)]
 struct ExampleAdapter<T> {
     id: u32,
     inpt: T,
+}
+
+#[cfg(kani)]
+unsafe impl<T> kani::Invariant for ExampleAdapter<T> {
+    fn is_valid(&self) -> bool {
+        true
+    }
 }
 
 #[cfg(kani)]
@@ -650,4 +658,15 @@ fn verify_unsafe_iter_bank_interleaved() {
         let bank_ele = bank_iter.next().unwrap();
         assert_eq!(i, *bank_ele);
     }
+}
+
+#[cfg(kani)]
+#[kani::proof]
+#[kani::unwind(257)]
+fn verify_unsafe_iter_bank_simple() {
+    let len = kani::any();
+    kani::assume(len < 256);
+    let mut bank: Vec<ExampleAdapter<usize>> = vec![kani::any(); len];
+
+    let _ = unsafe_iter_bank!(bank # inpt);
 }

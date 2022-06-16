@@ -662,11 +662,46 @@ fn verify_unsafe_iter_bank_interleaved() {
 
 #[cfg(kani)]
 #[kani::proof]
-#[kani::unwind(257)]
+#[kani::unwind(129)]
 fn verify_unsafe_iter_bank_simple() {
     let len = kani::any();
-    kani::assume(len < 256);
+    kani::assume(len < 128);
     let mut bank: Vec<ExampleAdapter<usize>> = vec![kani::any(); len];
 
     let _ = unsafe_iter_bank!(bank # inpt);
+}
+
+#[cfg(kani)]
+#[kani::proof]
+#[kani::unwind(129)]
+fn verify_unsafe_iter_bank_single_index_simple() {
+    let len = kani::any();
+    kani::assume(len < 128);
+    let mut bank: Vec<ExampleAdapter<[usize; 8]>> = vec![kani::any(); len];
+
+    let index: usize = kani::any();
+    kani::assume(index < 8);
+    let _ = unsafe_iter_bank!(bank # inpt[index]);
+}
+
+#[cfg(kani)]
+#[kani::proof]
+#[kani::unwind(129)]
+fn verify_unsafe_iter_bank_all_indices_simple() {
+    let len = kani::any();
+    kani::assume(len < 128);
+    let mut bank: Vec<ExampleAdapter<[usize; 8]>> = vec![kani::any(); len];
+
+    let _ = unsafe_iter_bank!(bank # (inpt)+);
+}
+
+#[cfg(kani)]
+#[kani::proof]
+#[kani::unwind(129)]
+fn verify_unsafe_iter_bank_interleaved_simple() {
+    let len = kani::any();
+    kani::assume(len < 128);
+    let mut bank: Vec<ExampleAdapter<[usize; 8]>> = vec![kani::any(); len];
+
+    let _ = unsafe_iter_bank!(bank # interleaved(inpt));
 }
